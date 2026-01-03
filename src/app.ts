@@ -7,15 +7,16 @@ import cors from "cors";
 const app = express();
 
 app.use(cors({
-    origin: process.env.APP_URL || "http://localhost:4000",
+    origin: process.env.APP_URL || "http://localhost:4000",  // client side url 
     credentials:true
 }))
 app.use(express.json());
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-//Api 
-app.use("/posts", postRouter)
+
+// Post Api 
+app.use("/posts", postRouter);
 
 
 app.get("/",(req,res) =>{
