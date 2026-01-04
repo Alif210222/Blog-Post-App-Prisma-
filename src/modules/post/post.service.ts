@@ -1,3 +1,4 @@
+import { SortOrder } from './../../../generated/prisma/internal/prismaNamespaceBrowser';
 import { Payload, PostWhereInput } from './../../../generated/prisma/internal/prismaNamespace';
 import { Post, PostStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
@@ -13,7 +14,19 @@ const createPost = async (data : Omit<Post, "id" | "createdAt" | "updatedAt"| "a
 }
 
 // Get post Service 
-   const getAllPost = async({search,tags,isFeatured,status} : {search : string | undefined , tags :string[] | [] , isFeatured: boolean | undefined , status : PostStatus | undefined }) => {
+   const getAllPost = async({
+    search,tags,isFeatured,status,page,limit,skip,sortBy,sortOrder
+    } : {
+    search : string | undefined ,
+    tags :string[] | [] ,
+    isFeatured: boolean | undefined ,
+    status : PostStatus | undefined,
+    page:number,
+    limit:number,
+    skip:number,
+    sortBy:string | undefined,
+    sortOrder:string | undefined
+}) => {
 
           const andCondition: PostWhereInput[] = [];
 
@@ -60,11 +73,15 @@ const createPost = async (data : Omit<Post, "id" | "createdAt" | "updatedAt"| "a
 
            //-----------------------------------------------      Query
         const allPost = await prisma.post.findMany({
+            take:limit,
+            skip,
             where:{
               AND:andCondition
-            }
-
+            },
+            orderBy: sortBy && sortOrder ? {
+               [ sortBy]:sortOrder   } : { createdAt : "desc"}
         });
+
         return allPost;
    }
 

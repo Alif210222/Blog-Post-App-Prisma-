@@ -1,8 +1,10 @@
+import { SortOrder } from './../../../generated/prisma/internal/prismaNamespaceBrowser';
 // create a postController function
 
 import { Request ,Response} from "express"
 import { postService  } from "./post.service"
 import { PostStatus } from "../../../generated/prisma/enums"
+import paginationSortingHelper from '../../helper/paginationSortingHelper';
 
 
 const createPost = async (req:Request, res:Response) =>{
@@ -36,12 +38,20 @@ const createPost = async (req:Request, res:Response) =>{
               const tags = req.query.tag ? (req.query.tag as string).split(",") : []; 
               const isFeatured = req.query.isFeatured ? req.query.isFeatured === "true" : undefined ;
               const status = req.query.status as PostStatus | undefined
+              // const page =Number(req.query.page ?? 1)
+              // const limit = Number(req.query.limit ?? 10)
+              // const skip = ( page - 1) * limit
+              // const sortBy = req.query.sortBy as string | undefined
+              // const sortOrder = req.query.SortOrder as string | undefined
 
-
+              const options = paginationSortingHelper(req.query);
+             // console.log(options); 
              // console.log(isFeatured)
 
-              const result = await postService.getAllPost({search : searchString , tags, isFeatured,status})
+             const {page,limit,skip,sortBy,sortOrder} = options;
+              const result = await postService.getAllPost({search : searchString , tags, isFeatured,status,page,limit,skip,sortBy,sortOrder})
               res.status(200).json(result)
+
         } catch (error) {
             console.log(error)
             res.status(400).json({
